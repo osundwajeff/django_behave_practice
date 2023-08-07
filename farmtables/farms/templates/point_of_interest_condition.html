@@ -1,10 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Point of interest condition</title>
+    <nav>
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'create_point_of_interest'%}">Point of interest</a>
+    </nav>
+    <title>Point of Interest Conditions</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+        }
+
+        img {
+            max-width: 100px;
+        }
+
+        .edit-form {
+            display: none;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .edit-form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .edit-form button {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
+    <h1>Point of Interest Conditions</h1>
+    <a href="{% url 'create_point_of_interest_condition' %}">Create Condition</a>
+    <table>
+        <thead>
+            <tr>
+                <th>Point of Interest</th>
+                <th>Condition</th>
+                <th>Date</th>
+                <th>Notes</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td><strong>{{ record.point_of_interest }}</strong></td>
+                <td><em>{{ record.condition }}</em></td>
+                <td><em>{{ record.date }}</em></td>
+                <td><em>{{ record.notes }}</em></td>
+                <td>
+                    {% if record.image %}
+                    <img src="{{ record.image.url }}" alt="{{ record.notes }}">
+                    {% endif %}
+                </td>
+                <td>
+                    <button onclick="showEditForm('{{ record.id }}')">Edit</button>
+                    <div class="edit-form" id="editForm{{ record.id }}">
+                        <form method="post" action="{% url 'create_point_of_interest_condition' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <label for="condition">Condition:</label>
+                            <input type="text" name="condition" id="condition" value="{{ record.point_of_interest_condition_records }}">
+                            <br>
+                            <label for="date">Date:</label>
+                            <input type="date" name="date" id="date" value="{{ record.date }}">
+                            <br>
+                            <label for="notes">Notes:</label>
+                            <textarea name="notes" id="notes">{{ record.notes }}</textarea>
+                            <br>
+                            <label for="image">Image:</label>
+                            <input type="file" name="image" id="image">
+                            <br>
+                            <!-- Add other input fields as needed -->
+                            <button type="submit">Save Changes</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
+    <script>
+        function showEditForm(recordId) {
+            var editForm = document.getElementById("editForm" + recordId);
+            if (editForm.style.display === "none") {
+                editForm.style.display = "block";
+            } else {
+                editForm.style.display = "none";
+            }
+        }
+    </script>
 </body>
 </html>

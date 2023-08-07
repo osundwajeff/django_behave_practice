@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <nav>
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'point_of_interest' %}">Point of interest</a>
+        <a href="{% url 'point_of_interest_condition'%}">Point of interest condition</a>
+    </nav>
     <title>Conditions</title>
     <style>
         table {
@@ -32,7 +37,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for condition in conditions %}
+            {% for condition in records %}
             <tr>
                 <td>{{ condition.id }}</td>
                 <td>{{ condition.notes }}</td>

@@ -1,11 +1,247 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Point of interest</title>
+    <nav>
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'point_of_interest_type'%}">Point of interest types</a>
+        <a href="{% url 'point_of_interest_condition'%}">Point of interest condition</a>
+    </nav>
+    <title>Point of Interests</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
+    <style>
+        #map {
+            width: 800px;
+            height: 500px;
+        }
+    </style>
 </head>
 <body>
+    <h1>Point of Interests</h1>
+    <div id="map"></div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+        var map = L.map('map').setView([0, 37], 7);
 
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Function to add a marker for each existing point of interest
+        function addMarkers() {
+            // Loop through the records and add markers with popups
+            {% for record in records %}
+                var latlng = [{{ record.latitude }}, {{ record.longitude }}];
+                var popupContent = "<strong>{{ record.point_of_interest_type.name }}</strong><br>{{ record.notes }}";
+
+                var marker = L.marker(latlng).addTo(map);
+                marker.bindPopup(popupContent);
+            {% endfor %}
+        }
+
+        // Add markers for existing points of interest on page load
+        addMarkers();
+
+        // Initialize the draw control for drawing on the map
+        var drawnItems = new L.FeatureGroup();
+        map.addLayer(drawnItems);
+
+        var drawControl = new L.Control.Draw({
+            draw: {
+                marker: true,  // Enable marker drawing
+                polyline: false,
+                polygon: false,
+                circle: false,
+                rectangle: false,
+            },
+            edit: {
+                featureGroup: drawnItems,
+                remove: true,
+            },
+        });
+        map.addControl(drawControl);
+
+        // Function to handle form submission and update the list of records
+        function submitFormAndRefreshList(form) {
+            // Create a new FormData object to capture form data
+            var formData = new FormData(form);
+
+            // Send the form data using an AJAX request
+            fetch("{% url 'create_point_of_interest' %}", {
+                method: "POST",
+                body: formData,
+                headers: { "X-CSRFToken": "{{ csrf_token }}" },
+            })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.json(); // Parse the response as JSON
+                } else {
+                    throw new Error("Failed to create the point of interest.");
+                }
+            })
+            .then(function (data) {
+                // Handle the successful response (data contains the newly created POI)
+                var newPOI = data;
+
+                // Create a marker for the new point of interest
+                var latlng = L.latLng(newPOI.latitude, newPOI.longitude);
+                var marker = L.marker(latlng).addTo(map);
+                var popupContent = "<strong>" + newPOI.type.name + "</strong><br>" + newPOI.notes;
+                marker.bindPopup(popupContent);
+
+                // Add the new marker to the drawnItems layer
+                drawnItems.addLayer(marker);
+
+                // Close the popup after the form submission
+                map.closePopup();
+
+                // Clear the form inputs
+                form.reset();
+
+                // Get the updated list of point of interest records from the server
+                fetch("{% url 'create_point_of_interest' %}", { method: "GET" })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error("Failed to fetch point of interest records.");
+                    }
+                })
+                .then(function (html) {
+                    // Update the list of records on the page
+                    var recordsContainer = document.getElementById("pointOfInterestRecords");
+                    recordsContainer.innerHTML = html;
+                })
+                .catch(function (error) {
+                    console.error(error);
+                });
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+        }
+
+        // Event handler when a new marker is created
+        map.on('draw:created', function (e) {
+            var layer = e.layer;
+            drawnItems.addLayer(layer);
+
+            // Show the form for the new point of interest
+            var latitude = layer.getLatLng().lat;
+            var longitude = layer.getLatLng().lng;
+
+            var popupContent = `
+                <form id="addPointForm" method="post" action="{% url 'create_point_of_interest' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="latitude" value="${latitude}">
+                    <input type="hidden" name="longitude" value="${longitude}">
+                    <label for="type">Type:</label>
+                    <select name="point_of_interest_type" id="type">
+                        {% for poi_type in point_of_interest_types %}
+                            <option value="{{ poi_type.id }}">{{ poi_type.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <label for="notes">Notes:</label>
+                    <textarea name="notes" id="notes"></textarea>
+                    <br>
+                    <label for="height_m">Height (m):</label>
+                    <input type="number" name="height_m" id="height_m" step="0.1">
+                    <br>
+                    <label for="installation_date">Installation Date:</label>
+                    <input type="date" name="installation_date" id="installation_date">
+                    <br>
+                    <label for="is_date_estimated">Is Date Estimated:</label>
+                    <input type="checkbox" name="is_date_estimated" id="is_date_estimated">
+                    <br>
+                    <label for="image">Image:</label>
+                    <input type="file" name="image" id="image">
+                    <br>
+                    <!-- Add other input fields as needed -->
+                    <button type="submit">Add Point of Interest</button>
+                </form>
+            `;
+
+            var popup = L.popup()
+                .setLatLng(layer.getLatLng())
+                .setContent(popupContent)
+                .openOn(map);
+
+            // Disable the map click event after the form is submitted
+            map.off('click', onMapClick);
+
+            // Add event listener to the form submission
+            var form = popup.getElement().querySelector("#addPointForm");
+            form.addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent default form submission behavior
+                submitFormAndRefreshList(form); // Handle form submission and list refresh
+            });
+
+            // Function to handle form submission and update the list of records
+            function submitFormAndRefreshList(form) {
+            // Create a new FormData object to capture form data
+            var formData = new FormData(form);
+
+    // Send the form data using an AJAX request
+    fetch("{% url 'create_point_of_interest' %}", {
+        method: "POST",
+        body: formData,
+        headers: { "X-CSRFToken": "{{ csrf_token }}" },
+    })
+        .then(function (response) {
+            if (response.ok) {
+                return response.json(); // Parse the response as JSON
+            } else {
+                throw new Error("Failed to create the point of interest.");
+            }
+        })
+        .then(function (data) {
+            // Handle the successful response (data contains the newly created POI)
+            var newPOI = data;
+
+            // Create a marker for the new point of interest
+            var latlng = L.latLng(newPOI.latitude, newPOI.longitude);
+            var marker = L.marker(latlng).addTo(map);
+            var popupContent = "<strong>" + newPOI.type.name + "</strong><br>" + newPOI.notes;
+            marker.bindPopup(popupContent);
+
+            // Add the new marker to the drawnItems layer
+            drawnItems.addLayer(marker);
+
+            // Close the popup after the form submission
+            map.closePopup();
+
+            // Clear the form inputs
+            form.reset();
+
+            // Get the updated list of point of interest records from the server
+            fetch("{% url 'create_point_of_interest' %}", { method: "GET" })
+            .then(function (response) {
+                if (response.ok) {
+                    return response.text();
+                } else {
+                    throw new Error("Failed to fetch point of interest records.");
+                }
+            })
+            .then(function (html) {
+                // Update the list of records on the page
+                var recordsContainer = document.getElementById("pointOfInterestRecords");
+                recordsContainer.innerHTML = html;
+            })
+            .catch(function (error) {
+                console.error(error);
+            });
+        })
+        .catch(function (error) {
+            console.error(error);
+        });
+    }
+
+        });
+    });
+    </script>
 </body>
 </html>

@@ -1,10 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Point of interest type</title>
+    <title>Point of Interest Type</title>
+    <nav>
+        <a href="{% url 'index' %}">Home</a>
+        <a href="{% url 'create_point_of_interest' %}">Point of interest</a>
+        <a href="{% url 'point_of_interest_condition'%}">Point of interest condition</a>
+    </nav>
+    <style>
+        form {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            max-width: 600px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            text-align: left;
+        }
+
+        img {
+            max-width: 100px;
+        }
+    </style>
 </head>
 <body>
-
+    <h1>Point of Interest Type</h1>
+    <form>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Notes</th>
+                    <th>Image</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td><strong>{{ record.name }}</strong></td>
+                    <td><em>{{ record.notes }}</em></td>
+                    <td>
+                        {% if record.image %}
+                        <img src="{{ record.image.url }}" alt="{{ record.name }}">
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </form>
 </body>
 </html>

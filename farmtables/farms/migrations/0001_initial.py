@@ -104,14 +104,14 @@ class Migration(migrations.Migration):
                 (
                     "condition",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="farm.condition"
+                        on_delete=django.db.models.deletion.CASCADE, to="farms.condition"
                     ),
                 ),
                 (
                     "point_of_interest",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to="farm.pointofinterest",
+                        to="farms.pointofinterest",
                     ),
                 ),
             ],
@@ -121,7 +121,7 @@ class Migration(migrations.Migration):
             name="point_of_interest_type",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE,
-                to="farm.pointofinteresttype",
+                to="farms.pointofinteresttype",
             ),
         ),
     ]

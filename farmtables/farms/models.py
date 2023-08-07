@@ -1,10 +1,12 @@
 from django.contrib.gis.db import models
 
 # Create your models here.
+
+
 class PointOfInterestType(models.Model):
     name = models.CharField(max_length=50)
     notes = models.TextField(blank=True)
-    image = models.ImageField(upload_to='point_of_interest_types', blank=True)
+    image = models.ImageField(upload_to='point_of_interest_types', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -15,12 +17,14 @@ class PointOfInterestType(models.Model):
 class PointOfInterest(models.Model):
     point_of_interest_type = models.ForeignKey(
         PointOfInterestType, on_delete=models.CASCADE)
+    latitude = models.FloatField(null=False)
+    longitude = models.FloatField(null=False)
     notes = models.TextField(blank=True)
-    image = models.ImageField(upload_to='point_of_interests', blank=True)
+    image = models.ImageField(upload_to='point_of_interests',null=True, blank=True)
     height_m = models.FloatField(null=True)
     installation_date = models.DateField(null=True)
     is_date_estimated = models.BooleanField(default=False)
-    geometry = models.GeometryField(srid=4326)
+    #geometry = models.GeometryField(srid=4326)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -30,7 +34,7 @@ class PointOfInterest(models.Model):
 
 class Condition(models.Model):
     notes = models.TextField(blank=True)
-    image = models.ImageField(upload_to='conditions', blank=True)
+    image = models.ImageField(upload_to='conditions', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -45,7 +49,7 @@ class PointOfInterestCondition(models.Model):
     condition = models.ForeignKey(
         Condition, on_delete=models.CASCADE)
     notes = models.TextField(blank=True)
-    image = models.ImageField(upload_to='point_of_interest_conditions', blank=True)
+    image = models.ImageField(upload_to='point_of_interest_conditions', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
