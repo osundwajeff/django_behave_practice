@@ -1,58 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <nav>
-        <a href="{% url 'index' %}">Home</a>
-        <a href="{% url 'point_of_interest' %}">Point of interest</a>
-        <a href="{% url 'point_of_interest_condition'%}">Point of interest condition</a>
-    </nav>
     <title>Conditions</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th, td {
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-            text-align: left;
-        }
-
-        img {
-            max-width: 100px;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
-    <h1>Conditions</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Notes</th>
-                <th>Image</th>
-                <th>Created At</th>
-                <th>Updated At</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for condition in records %}
-            <tr>
-                <td>{{ condition.id }}</td>
-                <td>{{ condition.notes }}</td>
-                <td>
-                    {% if condition.image %}
-                        <img src="{{ condition.image.url }}" alt="{{ condition.notes }}">
-                    {% else %}
-                        No Image
-                    {% endif %}
-                </td>
-                <td>{{ condition.created_at }}</td>
-                <td>{{ condition.updated_at }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
+        <div class="navbar-start">
+            <a class="navbar-item" href="{% url 'index' %}">Home</a>
+            <a class="navbar-item" href="{% url 'point_of_interest' %}">Point of Interest</a>
+            <a class="navbar-item" href="{% url 'point_of_interest_type'%}">Point of Interest Types</a>
+            <a class="navbar-item" href="{% url 'point_of_interest_condition'%}">Point of Interest Condition</a>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Conditions</h1>
+            <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Notes</th>
+                        <th>Image</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for condition in records %}
+                    <tr>
+                        <td>{{ condition.id }}</td>
+                        <td>{{ condition.notes }}</td>
+                        <td>
+                            {% if condition.image %}
+                                <img src="{{ condition.image.url }}" alt="{{ condition.notes }}">
+                            {% else %}
+                                No Image
+                            {% endif %}
+                        </td>
+                        <td>{{ condition.created_at }}</td>
+                        <td>{{ condition.updated_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 </body>
 </html>

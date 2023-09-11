@@ -1,18 +1,33 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
 </head>
 <body>
-<h1>Home Page</h1>
-    <ul>
-        <li><a href="/admin/">Admin Page</a></li>
-        <li><a href="{% url 'create_point_of_interest' %}">Point of interest</a></li>
-        <li><a href="{% url 'point_of_interest_type'%}">Point of interestType</a></li>
-        <li><a href="{% url 'point_of_interest_condition'%}">Point of interest condition</a></li>
-        <li><a href="{% url 'condition' %}">Condition</a></li>
-    </ul>
-
+    <section class="hero is-dark is-fullheight">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title has-text-centered is-size-1">Welcome</h1>
+                <div class="columns is-centered mt-6">
+                    <div class="column is-one-third">
+                        <div class="box">
+                            <h2 class="subtitle has-text-centered">Navigate to</h2>
+                            <ul class="menu-list">
+                                <li><a href="/admin/" class="button is-fullwidth is-light">Admin Page</a></li>
+                                <li><a href="{% url 'create_point_of_interest' %}" class="button is-fullwidth is-link">Point of Interest</a></li>
+                                <li><a href="{% url 'point_of_interest_type'%}" class="button is-fullwidth is-link">Point of Interest Type</a></li>
+                                <li><a href="{% url 'point_of_interest_condition'%}" class="button is-fullwidth is-link">Point of Interest Condition</a></li>
+                                <li><a href="{% url 'condition' %}" class="button is-fullwidth is-link">Condition</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </body>
 </html>
