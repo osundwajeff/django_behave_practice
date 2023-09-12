@@ -49,3 +49,22 @@ def step_iml(context):
     # Assert that the title matches the expected title
     expected_title = "Site administration | Django site admin"
     assert context.selenium.title == expected_title
+
+
+@given("user is on the homepage")
+def step_iml(context):
+    context.selenium = webdriver.Firefox(options=firefox_options)
+    # homepage
+    context.selenium.get(f"http://127.0.0.1:8000/")
+
+
+@when("user clicks on 'Point of Interest' link")
+def step_iml(context):
+    context.selenium.find_element(By.LINK_TEXT, 'Point of Interest').click()
+
+
+@then("the page is 'point_of_interest' page")
+def step_iml(context):
+    # Assert that the title matches the expected title
+    expected_title = "Point of Interests"
+    assert context.selenium.title == expected_title
