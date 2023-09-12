@@ -11,6 +11,20 @@ firefox_options = Options()
 firefox_options.add_argument("--headless")
 
 
+@given("the user is on the homepage")
+def step_iml(context):
+    context.selenium = webdriver.Firefox(options=firefox_options)
+    # homepage
+    context.selenium.get(f"http://127.0.0.1:8000/")
+
+
+@then("page is homepage")
+def step_iml(context):
+    # Assert that the title matches the expected title
+    expected_title = "Home"
+    assert context.selenium.title == expected_title
+
+
 @given("user is on 'Admin Log in page'")
 def step_iml(context):
     context.selenium = webdriver.Firefox(options=firefox_options)
