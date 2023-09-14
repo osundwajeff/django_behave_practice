@@ -31,7 +31,9 @@ def step_page_is_homepage(context):
 def step_user_is_on_admin_login(context):
     context.selenium = webdriver.Firefox(options=firefox_options)
     # login to admin panel
-    context.selenium.get(f"http://127.0.0.1:8000/admin/")
+    # homepage
+    context.selenium.get(f"http://127.0.0.1:8000/")
+    context.selenium.find_element(By.LINK_TEXT, 'Admin Page').click()
 
 
 @when("user clicks on 'Log in'")
